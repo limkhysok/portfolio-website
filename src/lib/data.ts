@@ -4,8 +4,8 @@
 
 export const personalInfo = {
     name: "Limkhy Sok",
-    title: "Full Stack Developer",
-    tagline: "Junior Full Stack Developer passionate about exploring tech stacks & AI/ML.",
+    title: "Junior Developer",
+    tagline: "Junior Developer passionate about exploring tech stacks & AI/ML.",
     location: "Phnom Penh, Cambodia",
     school: "IT Academy STEP Cambodia",
     email: "soklimkhy@gmail.com",
@@ -58,9 +58,9 @@ export const skillCategories = [
 
 export const experiences = [
     {
-        role: "Full Stack Developer",
-        company: "Your Company",
-        period: "2024 – Present",
+        role: "Junior Developer",
+        company: "Freelance",
+        period: "2023 – Present",
         description:
             "Developed and maintained scalable web applications using React, Django, and PostgreSQL. Led the migration to a microservices architecture, reducing API response time by 40%.",
         tags: ["React", "Django", "PostgreSQL", "Docker"],

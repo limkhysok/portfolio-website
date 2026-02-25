@@ -30,7 +30,7 @@ export default function AboutSection() {
                     <div className="tf-fade-left">
                         <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">
                             I am a Junior Developer<br />
-                            <span className="text-primary opacity-80">exploring AI/ML & modern web.</span>
+                            <span className="text-primary opacity-80">Love exploring AI/ML & modern web.</span>
                         </h2>
 
                         <div className="grid md:grid-cols-3 gap-8 items-start">

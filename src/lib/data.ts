@@ -5,50 +5,56 @@
 export const personalInfo = {
     name: "Limkhy Sok",
     title: "Full Stack Developer",
-    tagline: "I build fast, scalable, and beautiful web applications.",
+    tagline: "Junior Full Stack Developer passionate about exploring tech stacks & AI/ML.",
     location: "Phnom Penh, Cambodia",
+    school: "IT Academy STEP Cambodia",
     email: "soklimkhy@gmail.com",
     github: "https://github.com/limkhysok",
     linkedin: "https://www.linkedin.com/in/limkhysok/",
     telegram: "https://t.me/soklimkhy",
     resume: "/resume.pdf",
     avatarInitials: "LS",
-    bio: `Passionate Full Stack Developer with a knack for building clean, performant, and user-centric applications. 
-  I love turning complex problems into elegant solutions, and I'm always exploring the cutting edge of web technology.`,
+    bio: `I am a Junior Developer who loves to keep exploring new tech stacks. I have a deep interest in AI and Machine Learning, constantly pushing myself to learn how to integrate these technologies into modern web applications. Currently studying at IT Academy STEP Cambodia, I focus on writing clean code and building performant user experiences.`,
 };
 
-export const skills = [
+export const skillCategories = [
     {
-        category: "Frontend",
-        icon: "🎨",
-        items: [
-            { name: "React / Next.js", level: 92 },
-            { name: "TypeScript", level: 88 },
-            { name: "Tailwind CSS", level: 90 },
-            { name: "Framer Motion", level: 75 },
-        ],
+        title: "Programming Languages",
+        items: ["C++", "C#", "Python", "Kotlin", "TypeScript", "JavaScript", "SQL"]
     },
     {
-        category: "Backend",
-        icon: "⚙️",
-        items: [
-            { name: "Django / DRF", level: 85 },
-            { name: "Node.js / Express", level: 78 },
-            { name: "PostgreSQL", level: 82 },
-            { name: "Redis", level: 70 },
-        ],
+        title: "Web Frameworks",
+        items: ["Next.js", "React", "Django", "Spring Boot", "Tailwind CSS", "Node.js"]
     },
     {
-        category: "DevOps & Tools",
-        icon: "🚀",
-        items: [
-            { name: "Docker", level: 75 },
-            { name: "Git / GitHub", level: 90 },
-            { name: "Vercel / Railway", level: 85 },
-            { name: "Linux / CLI", level: 80 },
-        ],
+        title: "Desktop Frameworks",
+        items: ["WinForms", "WPF", "PyQt6", "Qt Designer"]
     },
+    {
+        title: "Databases",
+        subCategories: [
+            { name: "Relational", items: ["PostgreSQL", "MySQL", "SQLite"] },
+            { name: "Non-Relational", items: ["MongoDB", "Redis"] }
+        ]
+    },
+    {
+        title: "API & Testing",
+        items: ["RESTful API", "GraphQL", "Swagger", "Postman", "cURL", "Insomnia"]
+    },
+    {
+        title: "Data Analytics",
+        items: ["Pandas", "Matplotlib", "NumPy", "Scikit-learn", "SciPy"]
+    },
+    {
+        title: "Automation Frameworks",
+        items: ["Selenium", "Appium", "UIAutomator2", "PyAutoGUI", "Playwright"]
+    },
+    {
+        title: "DevOps & Deployment",
+        items: ["Docker", "Kubernetes", "Nginx", "Vercel", "Railway", "Linux/CLI"]
+    }
 ];
+
 
 export const experiences = [
     {

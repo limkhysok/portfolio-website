@@ -14,7 +14,7 @@ export default function ContactSection() {
             (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
             { threshold: 0.08 }
         );
-        ref.current?.querySelectorAll(".tf-fade").forEach((el) => obs.observe(el));
+        ref.current?.querySelectorAll('[class*="tf-fade"]').forEach((el) => obs.observe(el));
         return () => obs.disconnect();
     }, []);
 
@@ -41,18 +41,16 @@ export default function ContactSection() {
         >
             <div className="max-w-6xl mx-auto">
 
-                {/* Divider + Label */}
-                <div className="tf-fade flex items-center gap-4 mb-16">
-                    <div className="tf-divider" />
-                    <span className="section-label">Contact</span>
-                    <div className="tf-divider" />
+                {/* Section Label - Clean & Simple */}
+                <div className="tf-fade-left mb-16">
+                    <span className="text-primary font-mono text-[10px] uppercase tracking-[0.4em] font-bold">04 — Contact</span>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-16">
 
                     {/* Left */}
-                    <div className="tf-fade">
-                        <h2 className="section-heading mb-4">
+                    <div className="tf-fade-left">
+                        <h2 className="section-heading mb-4 text-4xl md:text-6xl">
                             Have a project<br />
                             in mind<span className="text-primary">?</span>
                         </h2>
@@ -88,7 +86,7 @@ export default function ContactSection() {
                     </div>
 
                     {/* Right — form */}
-                    <div className="tf-fade">
+                    <div className="tf-fade-right">
                         <form onSubmit={onSubmit} id="contact-form" className="space-y-5">
                             {[
                                 { id: "contact-name", type: "text", label: "Name", value: form.name, key: "name", placeholder: "Your name" },

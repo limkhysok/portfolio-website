@@ -4,78 +4,65 @@ import { useEffect, useRef } from "react";
 import { skills } from "@/lib/data";
 
 export default function SkillsSection() {
-    const sectionRef = useRef<HTMLElement>(null);
-
+    const ref = useRef<HTMLElement>(null);
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("in-view");
-                    }
-                });
-            },
-            { threshold: 0.1 }
+        const obs = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+            { threshold: 0.08 }
         );
-
-        const elements = sectionRef.current?.querySelectorAll(".section-animate");
-        elements?.forEach((el) => observer.observe(el));
-
-        return () => observer.disconnect();
+        ref.current?.querySelectorAll(".tf-fade").forEach((el) => obs.observe(el));
+        return () => obs.disconnect();
     }, []);
 
     return (
-        <section id="skills" ref={sectionRef} className="py-24 px-4 bg-muted/30">
+        <section
+            id="skills"
+            ref={ref}
+            className="py-24 px-6 border-t bg-muted/30"
+            style={{ borderColor: "var(--tf-border)" }}
+        >
             <div className="max-w-6xl mx-auto">
-                {/* Section header */}
-                <div className="section-animate text-center mb-16">
-                    <p className="text-primary font-mono text-sm font-semibold tracking-widest uppercase mb-2">
-                        What I work with
-                    </p>
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                        Skills & Tech Stack
-                    </h2>
+
+                {/* Divider + Label */}
+                <div className="tf-fade flex items-center gap-4 mb-16">
+                    <div className="tf-divider" />
+                    <span className="section-label">Tech Stack</span>
+                    <div className="tf-divider" />
                 </div>
 
+                {/* Skill groups */}
                 <div className="grid md:grid-cols-3 gap-6">
                     {skills.map((group, gi) => (
                         <div
                             key={gi}
                             id={`skill-group-${gi}`}
-                            className="section-animate p-6 rounded-2xl glass border border-border card-hover"
-                            style={{ transitionDelay: `${gi * 100}ms` }}
+                            className="tf-fade tf-card p-6"
+                            style={{ transitionDelay: `${gi * 80}ms` }}
                         >
-                            {/* Category header */}
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className="text-2xl">{group.icon}</span>
-                                <h3 className="font-bold text-lg text-foreground">
-                                    {group.category}
-                                </h3>
+                            <div className="flex items-center gap-2.5 mb-6">
+                                <span className="text-xl">{group.icon}</span>
+                                <h3 className="text-sm font-semibold text-foreground">{group.category}</h3>
                             </div>
 
-                            {/* Skill bars */}
                             <div className="space-y-5">
                                 {group.items.map((skill, si) => (
                                     <div key={si} id={`skill-${gi}-${si}`}>
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-sm font-medium text-foreground">
-                                                {skill.name}
-                                            </span>
-                                            <span className="text-xs font-mono text-primary font-semibold">
-                                                {skill.level}%
-                                            </span>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs text-muted-foreground font-medium">{skill.name}</span>
+                                            <span className="text-xs font-mono text-primary">{skill.level}%</span>
                                         </div>
-                                        {/* Bar track */}
-                                        <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
+                                        {/* Track */}
+                                        <div
+                                            className="h-px w-full rounded-full overflow-visible relative"
+                                            style={{ background: "var(--tf-border)" }}
+                                        >
                                             <div
-                                                className="h-full rounded-full skill-bar"
+                                                className="skill-bar absolute top-0 left-0 h-px rounded-full"
                                                 style={{
                                                     width: `${skill.level}%`,
-                                                    background: `linear-gradient(90deg, 
-                            oklch(0.55 0.22 265), 
-                            oklch(0.65 0.18 220)
-                          )`,
-                                                    animationDelay: `${gi * 200 + si * 100}ms`,
+                                                    background: "var(--primary)",
+                                                    boxShadow: "0 0 6px color-mix(in srgb, var(--primary) 60%, transparent)",
+                                                    animationDelay: `${gi * 200 + si * 80}ms`,
                                                 }}
                                             />
                                         </div>
@@ -86,23 +73,19 @@ export default function SkillsSection() {
                     ))}
                 </div>
 
-                {/* Tech badges cloud */}
-                <div className="section-animate mt-12 text-center">
-                    <p className="text-sm text-muted-foreground mb-6 font-medium">
+                {/* Additional tags */}
+                <div className="tf-fade mt-12">
+                    <p className="text-xs text-muted-foreground/50 mb-5 font-mono tracking-wider uppercase">
                         Also familiar with
                     </p>
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {[
                             "Python", "REST APIs", "JWT Auth", "Google OAuth",
                             "Celery", "Nginx", "AWS S3", "Figma",
                             "Apache ECharts", "Pandas", "SQLAlchemy", "WebSockets",
+                            "PyQt6", "Spring Boot", "Kotlin", "C#",
                         ].map((tech) => (
-                            <span
-                                key={tech}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-background border border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors cursor-default"
-                            >
-                                {tech}
-                            </span>
+                            <span key={tech} className="tag-pill">{tech}</span>
                         ))}
                     </div>
                 </div>

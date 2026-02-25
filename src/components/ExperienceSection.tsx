@@ -1,101 +1,82 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Briefcase, CalendarDays } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { experiences } from "@/lib/data";
 
 export default function ExperienceSection() {
-    const sectionRef = useRef<HTMLElement>(null);
-
+    const ref = useRef<HTMLElement>(null);
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("in-view");
-                    }
-                });
-            },
-            { threshold: 0.1 }
+        const obs = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+            { threshold: 0.08 }
         );
-
-        const elements = sectionRef.current?.querySelectorAll(".section-animate");
-        elements?.forEach((el) => observer.observe(el));
-
-        return () => observer.disconnect();
+        ref.current?.querySelectorAll(".tf-fade").forEach((el) => obs.observe(el));
+        return () => obs.disconnect();
     }, []);
 
     return (
-        <section id="experience" ref={sectionRef} className="py-24 px-4">
-            <div className="max-w-4xl mx-auto">
-                {/* Section header */}
-                <div className="section-animate text-center mb-16">
-                    <p className="text-primary font-mono text-sm font-semibold tracking-widest uppercase mb-2">
-                        Where I&apos;ve worked
-                    </p>
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                        Experience
-                    </h2>
+        <section
+            id="experience"
+            ref={ref}
+            className="py-24 px-6 border-t bg-background"
+            style={{ borderColor: "var(--tf-border)" }}
+        >
+            <div className="max-w-6xl mx-auto">
+
+                {/* Divider + Label */}
+                <div className="tf-fade flex items-center gap-4 mb-16">
+                    <div className="tf-divider" />
+                    <span className="section-label">Experience</span>
+                    <div className="tf-divider" />
                 </div>
 
-                {/* Timeline */}
-                <div className="relative">
-                    {/* Vertical line */}
-                    <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary/60 via-primary/20 to-transparent hidden sm:block" />
-
-                    <div className="space-y-8">
-                        {experiences.map((exp, i) => (
+                {/* Rows */}
+                <div>
+                    {experiences.map((exp, i) => (
+                        <div
+                            key={i}
+                            id={`experience-${i}`}
+                            className="tf-fade group border-t last:border-b"
+                            style={{
+                                borderColor: "var(--tf-border)",
+                                transitionDelay: `${i * 80}ms`,
+                            }}
+                        >
                             <div
-                                key={i}
-                                id={`experience-${i}`}
-                                className="section-animate relative"
-                                style={{ transitionDelay: `${i * 120}ms` }}
+                                className="py-7 grid grid-cols-[3rem_1fr_auto] sm:grid-cols-[3rem_1fr_1fr_auto] gap-4 items-start -mx-6 px-6 cursor-default transition-colors hover-row"
                             >
-                                {/* Timeline dot */}
-                                <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-primary border-2 border-background shadow-md hidden sm:block z-10" />
+                                {/* Number */}
+                                <span className="project-number pt-0.5">
+                                    {String(i + 1).padStart(2, "0")}
+                                </span>
 
-                                {/* Card */}
-                                <div className="sm:ml-16 rounded-2xl glass border border-border p-6 card-hover">
-                                    <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                                        <div className="flex items-start gap-3">
-                                            <div className="mt-0.5 w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                                <Briefcase className="w-4 h-4 text-primary" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-bold text-lg text-foreground leading-tight">
-                                                    {exp.role}
-                                                </h3>
-                                                <p className="text-primary font-semibold text-sm">
-                                                    {exp.company}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono whitespace-nowrap">
-                                            <CalendarDays className="w-3.5 h-3.5 shrink-0" />
-                                            {exp.period}
-                                        </div>
-                                    </div>
-
-                                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                                        {exp.description}
+                                {/* Role + company */}
+                                <div>
+                                    <p className="text-sm font-semibold text-foreground mb-0.5 group-hover:text-primary transition-colors">
+                                        {exp.role}
                                     </p>
+                                    <p className="text-xs text-primary">{exp.company}</p>
+                                </div>
 
-                                    <div className="flex flex-wrap gap-1.5">
+                                {/* Description */}
+                                <p className="hidden sm:block text-xs text-muted-foreground leading-relaxed max-w-sm">
+                                    {exp.description}
+                                </p>
+
+                                {/* Period + tags */}
+                                <div className="text-right">
+                                    <p className="text-xs font-mono text-muted-foreground/40 mb-2 whitespace-nowrap">
+                                        {exp.period}
+                                    </p>
+                                    <div className="flex flex-wrap gap-1 justify-end">
                                         {exp.tags.map((tag) => (
-                                            <Badge
-                                                key={tag}
-                                                variant="secondary"
-                                                className="text-xs font-medium rounded-lg bg-primary/10 text-primary border-0 hover:bg-primary/20"
-                                            >
-                                                {tag}
-                                            </Badge>
+                                            <span key={tag} className="tag-pill">{tag}</span>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

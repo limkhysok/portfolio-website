@@ -1,223 +1,159 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mail, Github, Linkedin, Send, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Mail, Github, Linkedin, ArrowUpRight, Send } from "lucide-react";
 import { personalInfo } from "@/lib/data";
 
 export default function ContactSection() {
-    const sectionRef = useRef<HTMLElement>(null);
-    const [formState, setFormState] = useState({
-        name: "",
-        email: "",
-        message: "",
-    });
+    const ref = useRef<HTMLElement>(null);
+    const [form, setForm] = useState({ name: "", email: "", message: "" });
     const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("in-view");
-                    }
-                });
-            },
-            { threshold: 0.1 }
+        const obs = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+            { threshold: 0.08 }
         );
-
-        const elements = sectionRef.current?.querySelectorAll(".section-animate");
-        elements?.forEach((el) => observer.observe(el));
-
-        return () => observer.disconnect();
+        ref.current?.querySelectorAll(".tf-fade").forEach((el) => obs.observe(el));
+        return () => obs.disconnect();
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setStatus("sending");
-        // TODO: Connect to your preferred email service (e.g., Resend, EmailJS, Formspree)
-        // Simulating a delay for demo purposes
+        // TODO: wire to Resend / Formspree / EmailJS
         setTimeout(() => {
             setStatus("sent");
-            setFormState({ name: "", email: "", message: "" });
+            setForm({ name: "", email: "", message: "" });
             setTimeout(() => setStatus("idle"), 4000);
         }, 1500);
     };
 
+    const inputClass =
+        "w-full rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-all";
+
     return (
-        <section id="contact" ref={sectionRef} className="py-24 px-4">
-            <div className="max-w-5xl mx-auto">
-                {/* Header */}
-                <div className="section-animate text-center mb-16">
-                    <p className="text-primary font-mono text-sm font-semibold tracking-widest uppercase mb-2">
-                        Let&apos;s connect
-                    </p>
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                        Get In Touch
-                    </h2>
-                    <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
-                        Have a project in mind or want to say hi? My inbox is always open!
-                    </p>
+        <section
+            id="contact"
+            ref={ref}
+            className="py-24 px-6 border-t bg-background"
+            style={{ borderColor: "var(--tf-border)" }}
+        >
+            <div className="max-w-6xl mx-auto">
+
+                {/* Divider + Label */}
+                <div className="tf-fade flex items-center gap-4 mb-16">
+                    <div className="tf-divider" />
+                    <span className="section-label">Contact</span>
+                    <div className="tf-divider" />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8">
-                    {/* Left panel */}
-                    <div className="section-animate space-y-6">
-                        {/* Glow card */}
-                        <div className="relative rounded-2xl p-6 glass border border-border overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/5 pointer-events-none" />
-                            <h3 className="font-bold text-xl mb-4 relative z-10">
-                                Let&apos;s work together
-                            </h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed mb-6 relative z-10">
-                                Whether you need a full-stack web app, a landing page, or
-                                technical consulting — I&apos;d love to hear about your project.
-                            </p>
+                <div className="grid lg:grid-cols-2 gap-16">
 
-                            <div className="space-y-3 relative z-10">
-                                <a
-                                    id="contact-email-link"
-                                    href={`mailto:${personalInfo.email}`}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/60 hover:bg-muted transition-colors group"
-                                >
-                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                        <Mail className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">Email</p>
-                                        <p className="text-sm font-medium text-foreground">{personalInfo.email}</p>
-                                    </div>
-                                </a>
+                    {/* Left */}
+                    <div className="tf-fade">
+                        <h2 className="section-heading mb-4">
+                            Have a project<br />
+                            in mind<span className="text-primary">?</span>
+                        </h2>
+                        <p className="text-muted-foreground text-sm leading-relaxed mb-10 max-w-sm">
+                            I&apos;m available for freelance projects and full-time roles.
+                            Let&apos;s talk about what you need.
+                        </p>
 
-                                <a
-                                    id="contact-location"
-                                    href="#"
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/60 hover:bg-muted transition-colors group"
-                                >
-                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                        <MapPin className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">Location</p>
-                                        <p className="text-sm font-medium text-foreground">{personalInfo.location}</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-
-                        {/* Social links */}
-                        <div className="flex gap-3">
+                        {/* Links */}
+                        {[
+                            { id: "contact-email-link", href: `mailto:${personalInfo.email}`, Icon: Mail, label: personalInfo.email },
+                            { id: "contact-github", href: personalInfo.github, Icon: Github, label: "GitHub", target: "_blank" },
+                            { id: "contact-linkedin", href: personalInfo.linkedin, Icon: Linkedin, label: "LinkedIn", target: "_blank" },
+                        ].map(({ id, href, Icon, label, target }) => (
                             <a
-                                id="contact-github"
-                                href={personalInfo.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl glass border border-border hover:border-primary/40 text-sm font-medium text-muted-foreground hover:text-primary transition-all"
+                                key={id}
+                                id={id}
+                                href={href}
+                                target={target}
+                                rel={target ? "noopener noreferrer" : undefined}
+                                className="flex items-center justify-between group py-4 border-b transition-colors hover-row -mx-1 px-1"
+                                style={{ borderColor: "var(--tf-border)" }}
                             >
-                                <Github className="w-4 h-4" />
-                                GitHub
+                                <div className="flex items-center gap-3">
+                                    <Icon className="w-4 h-4 text-muted-foreground/30" />
+                                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                                        {label}
+                                    </span>
+                                </div>
+                                <ArrowUpRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors" />
                             </a>
-                            <a
-                                id="contact-linkedin"
-                                href={personalInfo.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl glass border border-border hover:border-primary/40 text-sm font-medium text-muted-foreground hover:text-primary transition-all"
-                            >
-                                <Linkedin className="w-4 h-4" />
-                                LinkedIn
-                            </a>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Contact form */}
-                    <div className="section-animate">
-                        <form
-                            onSubmit={handleSubmit}
-                            className="rounded-2xl glass border border-border p-6 space-y-4"
-                            id="contact-form"
-                        >
-                            <div>
-                                <label
-                                    htmlFor="contact-name"
-                                    className="block text-sm font-medium text-foreground mb-1.5"
-                                >
-                                    Your Name
-                                </label>
-                                <input
-                                    id="contact-name"
-                                    type="text"
-                                    required
-                                    value={formState.name}
-                                    onChange={(e) =>
-                                        setFormState((p) => ({ ...p, name: e.target.value }))
-                                    }
-                                    placeholder="John Doe"
-                                    className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
-                                />
-                            </div>
+                    {/* Right — form */}
+                    <div className="tf-fade">
+                        <form onSubmit={onSubmit} id="contact-form" className="space-y-5">
+                            {[
+                                { id: "contact-name", type: "text", label: "Name", value: form.name, key: "name", placeholder: "Your name" },
+                                { id: "contact-email-input", type: "email", label: "Email", value: form.email, key: "email", placeholder: "hello@example.com" },
+                            ].map(({ id, type, label, value, key, placeholder }) => (
+                                <div key={id}>
+                                    <label htmlFor={id} className="block text-xs text-muted-foreground/50 mb-2 font-mono uppercase tracking-wider">
+                                        {label}
+                                    </label>
+                                    <input
+                                        id={id}
+                                        type={type}
+                                        required
+                                        value={value}
+                                        onChange={(e) => setForm((p) => ({ ...p, [key]: e.target.value }))}
+                                        placeholder={placeholder}
+                                        className={inputClass}
+                                        style={{
+                                            background: "var(--tf-input)",
+                                            border: "1px solid var(--tf-input-border)",
+                                        }}
+                                        onFocus={(e) => (e.target.style.borderColor = "color-mix(in srgb, var(--primary) 50%, transparent)")}
+                                        onBlur={(e) => (e.target.style.borderColor = "var(--tf-input-border)")}
+                                    />
+                                </div>
+                            ))}
 
                             <div>
-                                <label
-                                    htmlFor="contact-email-input"
-                                    className="block text-sm font-medium text-foreground mb-1.5"
-                                >
-                                    Email Address
-                                </label>
-                                <input
-                                    id="contact-email-input"
-                                    type="email"
-                                    required
-                                    value={formState.email}
-                                    onChange={(e) =>
-                                        setFormState((p) => ({ ...p, email: e.target.value }))
-                                    }
-                                    placeholder="hello@example.com"
-                                    className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="contact-message"
-                                    className="block text-sm font-medium text-foreground mb-1.5"
-                                >
+                                <label htmlFor="contact-message" className="block text-xs text-muted-foreground/50 mb-2 font-mono uppercase tracking-wider">
                                     Message
                                 </label>
                                 <textarea
                                     id="contact-message"
                                     required
                                     rows={5}
-                                    value={formState.message}
-                                    onChange={(e) =>
-                                        setFormState((p) => ({ ...p, message: e.target.value }))
-                                    }
+                                    value={form.message}
+                                    onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                                     placeholder="Tell me about your project..."
-                                    className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all resize-none"
+                                    className={`${inputClass} resize-none`}
+                                    style={{
+                                        background: "var(--tf-input)",
+                                        border: "1px solid var(--tf-input-border)",
+                                    }}
+                                    onFocus={(e) => (e.target.style.borderColor = "color-mix(in srgb, var(--primary) 50%, transparent)")}
+                                    onBlur={(e) => (e.target.style.borderColor = "var(--tf-input-border)")}
                                 />
                             </div>
 
-                            <Button
+                            <button
                                 id="contact-submit"
                                 type="submit"
                                 disabled={status !== "idle"}
-                                className="w-full rounded-xl font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow"
-                                size="lg"
+                                className="tf-btn tf-btn-accent w-full justify-center py-3 rounded-lg"
                             >
-                                {status === "idle" && (
-                                    <>
-                                        <Send className="mr-2 h-4 w-4" />
-                                        Send Message
-                                    </>
-                                )}
+                                {status === "idle" && <><Send className="w-4 h-4" /> Send message</>}
                                 {status === "sending" && (
                                     <span className="flex items-center gap-2">
-                                        <span className="w-4 h-4 border-2 border-primary-foreground/50 border-t-primary-foreground rounded-full animate-spin" />
+                                        <span className="w-4 h-4 border-2 rounded-full animate-spin"
+                                            style={{ borderColor: "var(--primary-foreground)", borderTopColor: "transparent" }}
+                                        />
                                         Sending...
                                     </span>
                                 )}
-                                {status === "sent" && "✅ Message Sent!"}
-                            </Button>
+                                {status === "sent" && "✅ Message sent!"}
+                            </button>
                         </form>
                     </div>
                 </div>

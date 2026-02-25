@@ -1,213 +1,296 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Github, ExternalLink, Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { projects } from "@/lib/data";
+import { useEffect, useRef, useState } from "react";
+import { Github, ArrowUpRight, CalendarDays } from "lucide-react";
+import { projects, type Project } from "@/lib/data";
+
+const ALL = "All";
+
+const CATEGORIES = Array.from(new Set(projects.map((p) => p.category)));
+
+const CATEGORY_ICON: Record<Project["category"], string> = {
+    Web: "🌐",
+    Desktop: "🖥️",
+    Mobile: "📱",
+    Game: "🎮",
+    System: "⚙️",
+};
 
 export default function ProjectsSection() {
-    const sectionRef = useRef<HTMLElement>(null);
+    const ref = useRef<HTMLElement>(null);
+    const [active, setActive] = useState(ALL);
+    const [isDark, setIsDark] = useState(false);
+
+    const filtered = active === ALL
+        ? projects
+        : projects.filter((p) => p.category === active);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("in-view");
-                    }
-                });
-            },
-            { threshold: 0.1 }
+        const syncTheme = () => setIsDark(document.documentElement.classList.contains("dark"));
+        syncTheme();
+        const mo = new MutationObserver(syncTheme);
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+        const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+            { threshold: 0.04 }
         );
+        ref.current?.querySelectorAll(".tf-fade").forEach((el) => io.observe(el));
 
-        const elements = sectionRef.current?.querySelectorAll(".section-animate");
-        elements?.forEach((el) => observer.observe(el));
-
-        return () => observer.disconnect();
+        return () => { io.disconnect(); mo.disconnect(); };
     }, []);
 
-    const featured = projects.filter((p) => p.featured);
-    const others = projects.filter((p) => !p.featured);
-
     return (
-        <section id="projects" ref={sectionRef} className="py-24 px-4 bg-muted/30">
+        <section
+            id="projects"
+            ref={ref}
+            className="py-24 px-6 border-t"
+            style={{ borderColor: "var(--tf-border)", background: "var(--muted)" }}
+        >
             <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="section-animate text-center mb-16">
-                    <p className="text-primary font-mono text-sm font-semibold tracking-widest uppercase mb-2">
-                        What I&apos;ve built
-                    </p>
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                        Projects
+
+                {/* Divider + Label */}
+                <div className="tf-fade flex items-center gap-4 mb-16">
+                    <div className="tf-divider" />
+                    <span className="section-label">Projects</span>
+                    <div className="tf-divider" />
+                </div>
+
+                {/* Heading + category filter */}
+                <div className="tf-fade flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10">
+                    <h2 className="section-heading">
+                        Recent work<span className="text-primary">.</span>
                     </h2>
+
+                    <div className="flex flex-wrap gap-1.5">
+                        {[ALL, ...CATEGORIES].map((cat) => (
+                            <button
+                                key={cat}
+                                id={`filter-${cat.toLowerCase()}`}
+                                onClick={() => setActive(cat)}
+                                className="px-3 py-1.5 rounded-md text-xs font-medium border transition-all duration-200"
+                                style={
+                                    active === cat
+                                        ? {
+                                            background: "var(--primary)",
+                                            borderColor: "var(--primary)",
+                                            color: "var(--primary-foreground)",
+                                            fontWeight: 700,
+                                        }
+                                        : {
+                                            borderColor: "var(--tf-border)",
+                                            color: "var(--muted-foreground)",
+                                            background: "transparent",
+                                        }
+                                }
+                            >
+                                {cat === ALL ? "All" : `${CATEGORY_ICON[cat as Project["category"]]} ${cat}`}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Featured projects */}
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    {featured.map((project, i) => (
-                        <div
-                            key={i}
-                            id={`project-featured-${i}`}
-                            className="section-animate group relative rounded-2xl glass border border-border overflow-hidden card-hover"
-                            style={{ transitionDelay: `${i * 100}ms` }}
-                        >
-                            {/* Gradient header */}
-                            <div
-                                className={`h-2 w-full bg-gradient-to-r ${project.gradient}`}
-                                aria-hidden="true"
-                            />
-
-                            {/* Shine sweep on hover */}
-                            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-                                <div className="absolute top-0 -left-24 w-16 h-full bg-white/5 rotate-12 group-hover:translate-x-[500px] transition-transform duration-700 ease-in-out" />
-                            </div>
-
-                            <div className="p-6">
-                                <div className="flex items-start justify-between gap-3 mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
-                                            {project.title}
-                                        </h3>
-                                        <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                                    </div>
-                                </div>
-
-                                <p className="text-muted-foreground text-sm leading-relaxed mb-4 min-h-[3.5rem]">
-                                    {project.description}
-                                </p>
-
-                                <div className="flex flex-wrap gap-1.5 mb-5">
-                                    {project.tags.map((tag) => (
-                                        <Badge
-                                            key={tag}
-                                            variant="secondary"
-                                            className="text-xs rounded-lg bg-primary/10 text-primary border-0"
-                                        >
-                                            {tag}
-                                        </Badge>
-                                    ))}
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    {project.github && (
-                                        <Button
-                                            id={`project-github-featured-${i}`}
-                                            variant="outline"
-                                            size="sm"
-                                            className="rounded-xl text-xs h-8 glass"
-                                            asChild
-                                        >
-                                            <a href={project.github} target="_blank" rel="noopener noreferrer">
-                                                <Github className="w-3.5 h-3.5 mr-1.5" />
-                                                Source
-                                            </a>
-                                        </Button>
-                                    )}
-                                    {project.live && (
-                                        <Button
-                                            id={`project-live-featured-${i}`}
-                                            size="sm"
-                                            className="rounded-xl text-xs h-8"
-                                            asChild
-                                        >
-                                            <a href={project.live} target="_blank" rel="noopener noreferrer">
-                                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                                                Live Demo
-                                            </a>
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Other projects */}
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {others.map((project, i) => (
-                        <div
-                            key={i}
-                            id={`project-other-${i}`}
-                            className="section-animate group rounded-2xl glass border border-border p-5 card-hover"
-                            style={{ transitionDelay: `${(i + featured.length) * 100}ms` }}
-                        >
-                            {/* Color indicator */}
-                            <div
-                                className={`w-10 h-1 rounded-full bg-gradient-to-r ${project.gradient} mb-4`}
-                                aria-hidden="true"
-                            />
-
-                            <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors mb-2">
-                                {project.title}
-                            </h3>
-                            <p className="text-muted-foreground text-xs leading-relaxed mb-4">
-                                {project.description}
-                            </p>
-
-                            <div className="flex flex-wrap gap-1 mb-4">
-                                {project.tags.map((tag) => (
-                                    <span
-                                        key={tag}
-                                        className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                {project.github && (
-                                    <a
-                                        id={`project-github-other-${i}`}
-                                        href={project.github}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-muted-foreground hover:text-primary transition-colors"
-                                        aria-label={`${project.title} source code`}
-                                    >
-                                        <Github className="w-4 h-4" />
-                                    </a>
-                                )}
-                                {project.live && (
-                                    <a
-                                        id={`project-live-other-${i}`}
-                                        href={project.live}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-muted-foreground hover:text-primary transition-colors"
-                                        aria-label={`${project.title} live demo`}
-                                    >
-                                        <ExternalLink className="w-4 h-4" />
-                                    </a>
-                                )}
-                            </div>
-                        </div>
+                {/* ── Card grid ── */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {filtered.map((project, i) => (
+                        <ProjectCard
+                            key={project.title}
+                            project={project}
+                            isDark={isDark}
+                            delay={i * 55}
+                        />
                     ))}
                 </div>
 
                 {/* GitHub CTA */}
-                <div className="section-animate text-center mt-12">
-                    <p className="text-muted-foreground text-sm mb-4">
-                        See more of my work on GitHub
-                    </p>
-                    <Button
+                <div className="tf-fade mt-10 flex justify-end">
+                    <a
                         id="projects-github-cta"
-                        variant="outline"
-                        className="rounded-xl glass"
-                        asChild
+                        href="https://github.com/limkhysok"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tf-btn"
                     >
-                        <a
-                            href="https://github.com/yourusername"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Github className="mr-2 h-4 w-4" />
-                            View GitHub Profile
-                        </a>
-                    </Button>
+                        <Github className="w-3.5 h-3.5" />
+                        View all on GitHub
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
                 </div>
             </div>
         </section>
+    );
+}
+
+/* ═══════════════════════════════════════════════════
+   PROJECT CARD
+   — borderless, site-palette only (black/white/lime)
+   — lime accent bar slides in from left on hover
+   — card lifts with neutral shadow, no color glow
+   ═══════════════════════════════════════════════════ */
+function ProjectCard({
+    project,
+    isDark,
+    delay,
+}: {
+    project: Project;
+    isDark: boolean;
+    delay: number;
+}) {
+    const cardBg = isDark ? "#111111" : "#ffffff";
+    const borderColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)";
+    const gridLine = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
+    const textMain = isDark ? "#e0e0e0" : "#0a0a0a";
+    const textMuted = isDark ? "#555555" : "#9ca3af";
+    const tagBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+    const tagColor = isDark ? "#444444" : "#b0b0b0";
+    const dateMono = isDark ? "#2e2e2e" : "#d1d5db";
+    const linkColor = isDark ? "#383838" : "#c0c0c0";
+    const shadow = isDark
+        ? "0 4px 24px rgba(0,0,0,0.50)"
+        : "0 4px 24px rgba(0,0,0,0.08)";
+
+    return (
+        <div
+            id={`project-${project.title.toLowerCase().replace(/\s+/g, "-")}`}
+            className="tf-fade group relative flex flex-col rounded-xl overflow-hidden cursor-pointer"
+            style={{
+                background: cardBg,
+                border: "none",
+                transitionDelay: `${delay}ms`,
+                transition: "transform 0.28s ease, box-shadow 0.28s ease",
+            }}
+            onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = shadow;
+            }}
+            onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+            }}
+            onClick={() => window.open(project.link, "_blank", "noopener,noreferrer")}
+        >
+            {/* ── Lime accent bar — full width, slides in on hover ── */}
+            <div
+                className="absolute top-0 left-0 h-[2px] w-0 group-hover:w-full"
+                style={{
+                    background: "var(--primary)",
+                    transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
+                }}
+                aria-hidden="true"
+            />
+
+            {/* ── Inner dot-grid texture ── */}
+            <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                    backgroundImage: `radial-gradient(circle, ${gridLine} 1px, transparent 1px)`,
+                    backgroundSize: "20px 20px",
+                    opacity: 0.8,
+                }}
+                aria-hidden="true"
+            />
+
+            {/* ── Content ── */}
+            <div className="relative z-10 flex flex-col flex-1 p-5">
+
+                {/* Category tag + status */}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                    <span
+                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold"
+                        style={{ color: textMuted }}
+                    >
+                        <span>{CATEGORY_ICON[project.category]}</span>
+                        {project.category}
+                    </span>
+
+                    {project.status && (
+                        <span
+                            className="flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                            style={
+                                project.status === "Active"
+                                    ? { color: "#22c55e", background: "rgba(34,197,94,0.08)" }
+                                    : { color: "#f59e0b", background: "rgba(245,158,11,0.08)" }
+                            }
+                        >
+                            <span
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{
+                                    background: project.status === "Active" ? "#22c55e" : "#f59e0b",
+                                }}
+                            />
+                            {project.status}
+                        </span>
+                    )}
+                </div>
+
+                {/* Title */}
+                <h3
+                    className="font-bold text-[15px] leading-snug mb-2"
+                    style={{ color: textMain }}
+                >
+                    <span
+                        className="group-hover:text-primary transition-colors duration-200"
+                        style={{ transition: "color 0.2s" }}
+                    >
+                        {project.title}
+                    </span>
+                </h3>
+
+                {/* Description */}
+                <p
+                    className="text-[12px] leading-relaxed mb-5 flex-1"
+                    style={{ color: textMuted }}
+                >
+                    {project.description}
+                </p>
+
+                {/* Tech tags */}
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                    {project.techs.map((tech) => (
+                        <span
+                            key={tech}
+                            className="px-2 py-0.5 rounded text-[11px] font-mono"
+                            style={{
+                                border: `1px solid ${tagBorder}`,
+                                color: tagColor,
+                                background: "transparent",
+                            }}
+                        >
+                            {tech}
+                        </span>
+                    ))}
+                </div>
+
+                {/* Footer: date + source link */}
+                <div
+                    className="flex items-center justify-between pt-4"
+                    style={{ borderTop: `1px solid ${borderColor}` }}
+                >
+                    <div
+                        className="flex items-center gap-1.5 text-[11px] font-mono"
+                        style={{ color: dateMono }}
+                    >
+                        <CalendarDays className="w-3 h-3" />
+                        {project.date}
+                    </div>
+
+                    <a
+                        id={`project-link-${project.title.toLowerCase().replace(/\s+/g, "-")}`}
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-[11px] font-medium"
+                        style={{ color: linkColor, transition: "color 0.2s" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--primary)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = linkColor)}
+                    >
+                        <Github className="w-3.5 h-3.5" />
+                        Source
+                        <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
+                    </a>
+                </div>
+            </div>
+        </div>
     );
 }
